@@ -7,13 +7,13 @@ function httpUrl(url) {
   }
 }
 
-// Berechtigungsmuster für die Origin einer Seite, z. B. "https://example.com/*".
+// Permission pattern for a page's origin, e.g. "https://example.com/*".
 export function originPattern(url) {
   const u = httpUrl(url);
   return u ? `${u.protocol}//${u.hostname}/*` : null;
 }
 
-// Referer für ffmpeg: Seiten-URL ohne Query und Fragment, damit keine Tokens mitgehen.
+// Referer for ffmpeg: page URL without query and fragment so no tokens leak.
 export function refererFor(url) {
   const u = httpUrl(url);
   return u ? u.origin + u.pathname : null;

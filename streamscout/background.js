@@ -9,14 +9,14 @@ const queues = new Map();
 const storageKey = (tabId) => `tab:${tabId}`;
 const emptyState = () => ({ pageUrl: null, items: [], children: [] });
 
-// Serialisiert Zugriffe pro Tab, damit parallele Funde sich nicht überschreiben.
+// Serializes access per tab so parallel finds do not overwrite each other.
 function enqueue(tabId, task) {
   const run = (queues.get(tabId) ?? Promise.resolve()).then(task);
   queues.set(tabId, run.catch(() => {}));
   return run;
 }
 
-// mutate(state) gibt true zurück, wenn sich etwas geändert hat.
+// mutate(state) returns true if something changed.
 function updateTab(tabId, mutate) {
   return enqueue(tabId, async () => {
     const key = storageKey(tabId);
@@ -37,7 +37,7 @@ function clearTab(tabId) {
   });
 }
 
-// Ohne Freischaltung der Seite im Tab wird nichts erfasst.
+// Nothing is recorded unless the tab's site is activated.
 async function activatedTab(tabId) {
   try {
     const tab = await chrome.tabs.get(tabId);
@@ -53,7 +53,7 @@ async function activatedOrigins() {
   return origins.filter((o) => !REQUIRED_ORIGINS.includes(o));
 }
 
-// Registriert das Content Script genau für die freigeschalteten Origins.
+// Registers the content script for exactly the activated origins.
 let syncRun = Promise.resolve();
 function syncContentScripts() {
   syncRun = syncRun.catch(() => {}).then(registerContentScripts);
@@ -70,8 +70,8 @@ async function registerContentScripts() {
   ]);
 }
 
-// Injiziert sofort in offene Tabs, damit nach dem Aktivieren kein Neuladen nötig ist.
-// Chrome injiziert nur in Frames, für die eine Berechtigung besteht – auch in iframes.
+// Injects into open tabs right away so no reload is needed after activation.
+// Chrome only injects into frames with permission, including iframes.
 async function injectIntoOpenTabs() {
   const tabs = await chrome.tabs.query({});
   await Promise.all(
@@ -89,14 +89,14 @@ async function clearDeactivatedTabs() {
   }
 }
 
-// Lädt die Playlist bevorzugt über das Content Script (Kontext und CORS der Seite),
-// sonst direkt – ohne Cookies.
+// Loads the playlist via the content script if possible (page context and CORS),
+// otherwise directly, without cookies.
 async function fetchText(tabId, frameId, url) {
   try {
     const res = await chrome.tabs.sendMessage(tabId, { type: 'fetch-playlist', url }, { frameId });
     if (res && !res.error) return res;
   } catch {
-    // Kein Content Script in diesem Frame.
+    // No content script in this frame.
   }
   const res = await fetch(url, { credentials: 'omit', signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
   return { status: res.status, text: await res.text() };
@@ -117,7 +117,7 @@ async function inspect(tabId, frameId, key, url) {
   });
 }
 
-// frameUrl ist die Seite oder das iframe, aus dem die Anfrage kam (für den Referer).
+// frameUrl is the page or iframe the request came from (used for the referer).
 async function addStream({ tabId, frameId, url, frameUrl, title, httpStatus }) {
   if (tabId < 0 || !isM3u8Url(url)) return;
   const tab = await activatedTab(tabId);
@@ -131,7 +131,7 @@ async function addStream({ tabId, frameId, url, frameUrl, title, httpStatus }) {
     if (state.children.includes(key)) return false;
     const existing = state.items.find((i) => i.key === key);
     if (existing) {
-      // Eine URL mit Query (z. B. signiert) ersetzt dieselbe Playlist ohne Query.
+      // A URL with query (e.g. signed) replaces the same playlist without query.
       if (!new URL(url).search || new URL(existing.url).search) return false;
       existing.url = url;
       existing.status = Status.CHECKING;
@@ -171,12 +171,12 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
   addStream({ tabId: sender.tab.id, frameId: sender.frameId, url: msg.url, frameUrl: sender.url, title: msg.title });
 });
 
-// Neue Seite im Tab: Liste leeren.
+// New page in the tab: clear the list.
 chrome.webNavigation.onCommitted.addListener(({ tabId, frameId }) => {
   if (frameId === 0) clearTab(tabId);
 });
 
-// Seitenwechsel in Single-Page-Apps (pushState/replaceState): Liste leeren, wenn sich die URL ändert.
+// Single-page-app navigation (pushState/replaceState): clear the list when the URL changes.
 chrome.webNavigation.onHistoryStateUpdated.addListener(({ tabId, frameId, url }) => {
   if (frameId !== 0) return;
   const pageUrl = withoutHash(url);

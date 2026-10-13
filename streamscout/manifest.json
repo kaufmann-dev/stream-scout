@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "StreamScout",
   "version": "1.0.0",
-  "description": "Findet HLS-Links (.m3u8) auf freigeschalteten Seiten und kopiert Link oder ffmpeg-Befehl.",
+  "description": "Finds HLS links (.m3u8) on activated sites and copies the link or an ffmpeg command.",
   "permissions": ["storage", "webRequest", "webNavigation", "scripting", "activeTab"],
   "host_permissions": ["https://stream.mux.com/*"],
   "optional_host_permissions": ["<all_urls>"],

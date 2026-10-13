@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>StreamScout</title>
@@ -12,34 +12,34 @@
         <h1>StreamScout</h1>
         <span id="site-host" class="site-host"></span>
       </div>
-      <button id="deactivate" type="button" hidden>Deaktivieren</button>
+      <button id="deactivate" type="button" hidden>Deactivate</button>
     </header>
 
-    <p id="unsupported" class="note" hidden>StreamScout funktioniert nur auf http- und https-Seiten.</p>
+    <p id="unsupported" class="note" hidden>StreamScout only works on http and https pages.</p>
 
     <section id="inactive" class="inactive" hidden>
-      <p class="note">StreamScout ist auf dieser Seite nicht aktiv. Erst nach der Aktivierung werden Streams erkannt.</p>
-      <button id="activate" class="primary" type="button">Auf dieser Seite aktivieren</button>
+      <p class="note">StreamScout is not active on this site. Streams are only detected after activation.</p>
+      <button id="activate" class="primary" type="button">Activate on this site</button>
     </section>
 
     <section id="active" hidden>
       <div class="toolbar">
         <label class="setting">
-          ffmpeg für
+          ffmpeg for
           <select id="shell"></select>
         </label>
-        <label class="setting" title="Seiten-URL ohne Query als -referer mitsenden. Manche Server verlangen das.">
+        <label class="setting" title="Send the page URL without query as -referer. Some servers require it.">
           <input id="referer" type="checkbox" />
           Referer
         </label>
-        <button id="copy-all" type="button" disabled>Alle Links kopieren</button>
+        <button id="copy-all" type="button" disabled>Copy all links</button>
       </div>
-      <p id="empty" class="note" hidden>Keine Streams gefunden. Starte die Wiedergabe oder lade die Seite neu.</p>
+      <p id="empty" class="note" hidden>No streams found. Start playback or reload the page.</p>
       <ul id="list"></ul>
 
       <section id="frames" class="frames" hidden>
-        <h2>Eingebettete Seiten</h2>
-        <p class="note">Player in iframes werden nur erkannt, wenn ihre Seite ebenfalls aktiviert ist.</p>
+        <h2>Embedded sites</h2>
+        <p class="note">Players in iframes are only detected if their site is activated too.</p>
         <ul id="frame-list"></ul>
       </section>
     </section>
@@ -62,13 +62,13 @@
         </div>
         <div class="tools">
           <label class="filename">
-            <span class="visually-hidden">Dateiname</span>
+            <span class="visually-hidden">File name</span>
             <input type="text" spellcheck="false" autocomplete="off" maxlength="80" />
             <span class="ext">.mp4</span>
           </label>
           <div class="actions">
-            <button class="copy-link primary" type="button">Link kopieren</button>
-            <button class="copy-command small" type="button">ffmpeg-Befehl kopieren</button>
+            <button class="copy-link primary" type="button">Copy link</button>
+            <button class="copy-command small" type="button">Copy ffmpeg command</button>
           </div>
         </div>
       </li>

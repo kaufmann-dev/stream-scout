@@ -1,5 +1,5 @@
 (() => {
-  // Schutz gegen doppelte Injektion (Registrierung plus Injektion beim Aktivieren).
+  // Guard against double injection (registration plus injection on activation).
   if (globalThis.__streamScoutLoaded) return;
   globalThis.__streamScoutLoaded = true;
 
@@ -19,8 +19,8 @@
 
   function report(value) {
     const url = toUrl(value);
-    // Nach einem Seitenwechsel in Single-Page-Apps leert der Background die Liste,
-    // daher werden bekannte Playlists erneut gemeldet.
+    // After a single-page-app navigation the background clears the list,
+    // so known playlists are reported again.
     if (location.href !== seenHref) {
       seenHref = location.href;
       seen.clear();
@@ -59,7 +59,7 @@
 
   if (document.documentElement) scan(document.documentElement);
 
-  // Lädt Playlists im Kontext der Seite, damit dieselben CORS-Regeln gelten wie für den Player.
+  // Loads playlists in the page context so the same CORS rules apply as for the player.
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg?.type !== 'fetch-playlist') return;
     fetch(msg.url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })

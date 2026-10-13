@@ -1,5 +1,5 @@
-// ffmpeg-Befehle mit korrektem Quoting pro Shell. Enthalten nie Cookies, Tokens oder
-// Header außer einem optionalen Referer.
+// ffmpeg commands with correct quoting per shell. They never contain cookies, tokens or
+// headers other than an optional referer.
 
 export const SHELLS = {
   powershell: 'PowerShell',
@@ -10,20 +10,20 @@ export const SHELLS = {
 export function quote(value, shell) {
   switch (shell) {
     case 'powershell':
-      // PowerShell behandelt auch typografische Apostrophe als Anführungszeichen.
+      // PowerShell also treats typographic apostrophes as quotes.
       return `'${value.replace(/['‘’‚‛]/g, '$&$&')}'`;
     case 'cmd':
-      // Jedes % wird aus den Anführungszeichen herausgelöst und mit ^ maskiert,
-      // damit CMD keine Umgebungsvariablen wie %CD% einsetzt.
+      // Every % is moved outside the quotes and escaped with ^
+      // so CMD does not expand environment variables such as %CD%.
       return `"${value.replaceAll('%', '"^%"')}"`;
     case 'bash':
       return `'${value.replaceAll("'", "'\\''")}'`;
     default:
-      throw new Error(`Unbekannte Shell: ${shell}`);
+      throw new Error(`Unknown shell: ${shell}`);
   }
 }
 
-// referer ist optional; ffmpeg erwartet -referer vor -i.
+// referer is optional; ffmpeg expects -referer before -i.
 export function buildFfmpegCommand(url, filename, shell, { referer } = {}) {
   const refererArg = referer ? `-referer ${quote(referer, shell)} ` : '';
   return `ffmpeg -hide_banner ${refererArg}-i ${quote(url, shell)} -sn -c copy ${quote(`${filename}.mp4`, shell)}`;

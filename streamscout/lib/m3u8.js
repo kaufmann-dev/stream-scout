@@ -1,4 +1,4 @@
-// Erkennung, Parsing und Schutzprüfung von HLS-Playlists (.m3u8).
+// Detection, parsing and protection checks for HLS playlists (.m3u8).
 
 export const Status = {
   CHECKING: 'checking',
@@ -17,7 +17,7 @@ export function isM3u8Url(url) {
   }
 }
 
-// Schlüssel zum Entfernen von Duplikaten: URL ohne Query und Fragment.
+// Key for removing duplicates: URL without query and fragment.
 export function playlistKey(url) {
   const u = new URL(url);
   return u.origin + u.pathname;
@@ -36,7 +36,7 @@ export function parseAttributes(value) {
 
 export function parsePlaylist(text, baseUrl) {
   const lines = text.replace(/^﻿/, '').split(/\r?\n/).map((l) => l.trim());
-  if (lines[0] !== '#EXTM3U') throw new Error('Keine HLS-Playlist');
+  if (lines[0] !== '#EXTM3U') throw new Error('Not an HLS playlist');
 
   const playlist = {
     isMaster: false,
@@ -98,7 +98,7 @@ export function isLive(playlist) {
   return !playlist.endList && playlist.playlistType !== 'VOD';
 }
 
-// Kennzahlen für die Anzeige: Live/VOD, Dauer (nur VOD) und höchste Auflösung.
+// Display details: live/VOD, duration (VOD only) and highest resolution.
 function describe(master, media) {
   const heights = master ? master.variants.map((v) => v.height).filter(Boolean) : [];
   const info = { height: heights.length ? Math.max(...heights) : null };
@@ -120,9 +120,9 @@ async function load(url, fetchText) {
   return { playlist: parsePlaylist(res.text, url) };
 }
 
-// fetchText(url) liefert { status, text } oder wirft bei Netzwerkfehlern.
-// Ergebnis: { status, httpStatus?, children, info? } – children sind die Schlüssel der
-// vom Master referenzierten Playlists, die nicht als eigene Streams gelten.
+// fetchText(url) returns { status, text } or throws on network errors.
+// Result: { status, httpStatus?, children, info? } – children are the keys of the
+// playlists referenced by the master, which do not count as separate streams.
 export async function inspectStream(url, fetchText) {
   let master;
   try {

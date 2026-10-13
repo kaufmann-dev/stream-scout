@@ -1,4 +1,4 @@
-// Erzeugt aus einem Seitentitel einen sicheren ASCII-Dateinamen (ohne Endung).
+// Turns a page title into a safe ASCII file name (without extension).
 
 export const MAX_FILENAME_LENGTH = 80;
 
@@ -20,8 +20,8 @@ export function toFilename(title, fallback = 'stream') {
   return name || fallback;
 }
 
-// Hängt bei Kollisionen " (2)", " (3)" … an. taken enthält kleingeschriebene Namen,
-// weil Windows Groß- und Kleinschreibung nicht unterscheidet.
+// Appends " (2)", " (3)" … on collisions. taken holds lowercase names
+// because Windows file names are case-insensitive.
 export function uniqueFilename(name, taken) {
   if (!taken.has(name.toLowerCase())) return name;
   for (let n = 2; ; n++) {

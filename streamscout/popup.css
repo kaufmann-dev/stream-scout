@@ -45,7 +45,7 @@
   white-space: nowrap;
 }
 
-/* Auf body statt :root, weil Chrome Extension-Seiten ein eigenes body-Stylesheet gibt. */
+/* Set on body instead of :root because Chrome gives extension pages its own body stylesheet. */
 body {
   width: 440px;
   margin: 0;

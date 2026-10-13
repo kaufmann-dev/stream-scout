@@ -4,11 +4,11 @@ import { Status } from './lib/m3u8.js';
 import { originPattern } from './lib/sites.js';
 
 const STATUS_LABELS = {
-  [Status.CHECKING]: 'Wird geprüft …',
-  [Status.READY]: 'Bereit',
-  [Status.PROTECTED]: 'Geschützt (verschlüsselt oder DRM)',
-  [Status.DENIED]: 'Zugriff verweigert',
-  [Status.UNKNOWN]: 'Nicht prüfbar',
+  [Status.CHECKING]: 'Checking …',
+  [Status.READY]: 'Ready',
+  [Status.PROTECTED]: 'Protected (encrypted or DRM)',
+  [Status.DENIED]: 'Access denied',
+  [Status.UNKNOWN]: 'Could not check',
 };
 
 const $ = (id) => document.getElementById(id);
@@ -57,7 +57,7 @@ async function copy(text, message) {
     await navigator.clipboard.writeText(text);
     showToast(message);
   } catch {
-    showToast('Kopieren fehlgeschlagen.');
+    showToast('Copy failed.');
   }
 }
 
@@ -76,12 +76,12 @@ function createRow(item) {
     input.value = toFilename(input.value, toFilename(li.item.title));
     filenames.set(item.key, input.value);
   });
-  li.querySelector('.copy-link').addEventListener('click', () => copy(li.item.url, 'Link kopiert.'));
+  li.querySelector('.copy-link').addEventListener('click', () => copy(li.item.url, 'Link copied.'));
   li.querySelector('.copy-command').addEventListener('click', () => {
     const name = toFilename(input.value, toFilename(li.item.title));
     const shell = shellSelect.value;
     const referer = refererCheckbox.checked ? li.item.referer : undefined;
-    copy(buildFfmpegCommand(li.item.url, name, shell, { referer }), `ffmpeg-Befehl für ${SHELLS[shell]} kopiert.`);
+    copy(buildFfmpegCommand(li.item.url, name, shell, { referer }), `ffmpeg command for ${SHELLS[shell]} copied.`);
   });
   return li;
 }
@@ -97,7 +97,7 @@ function updateRow(li, item) {
   li.querySelector('.tools').hidden = !isCopyable(item);
 }
 
-// Aktualisiert Zeilen an Ort und Stelle, damit Eingaben im Dateinamen erhalten bleiben.
+// Updates rows in place so edits to file names are kept.
 function renderStreams(state) {
   const items = state?.items ?? [];
   copyable = items.filter(isCopyable);
@@ -126,16 +126,16 @@ function renderStreams(state) {
 async function toggleOrigin(origin, active) {
   if (active) {
     if (!(await chrome.permissions.remove({ origins: [origin] }))) {
-      showToast('Deaktivieren nicht möglich. Prüfe den Websitezugriff unter chrome://extensions.');
+      showToast('Could not deactivate. Check site access at chrome://extensions.');
     }
   } else if (!(await chrome.permissions.request({ origins: [origin] }))) {
-    showToast('Berechtigung nicht erteilt.');
+    showToast('Permission not granted.');
   }
-  // Content Script und Injektion übernimmt der Background über permissions.onAdded/onRemoved.
+  // The background registers and injects the content script via permissions.onAdded/onRemoved.
   await renderSite();
 }
 
-// Origins der iframes im Tab, z. B. eingebettete Player.
+// Origins of the iframes in the tab, e.g. embedded players.
 async function renderFrames() {
   const frames = (await chrome.webNavigation.getAllFrames({ tabId: tab.id })) ?? [];
   const origins = [...new Set(frames.map((f) => originPattern(f.url)))].filter((o) => o && o !== pattern);
@@ -148,7 +148,7 @@ async function renderFrames() {
       li.querySelector('.frame-host').textContent = host;
       li.querySelector('.frame-host').title = host;
       const button = li.querySelector('button');
-      button.textContent = states[i] ? 'Deaktivieren' : 'Aktivieren';
+      button.textContent = states[i] ? 'Deactivate' : 'Activate';
       button.setAttribute('aria-label', `${host} ${button.textContent.toLowerCase()}`);
       button.addEventListener('click', () => toggleOrigin(origin, states[i]));
       return li;
@@ -185,7 +185,7 @@ $('deactivate').addEventListener('click', () => toggleOrigin(pattern, true));
 
 $('copy-all').addEventListener('click', () => {
   const n = copyable.length;
-  copy(copyable.map((i) => i.url).join('\n'), n === 1 ? '1 Link kopiert.' : `${n} Links kopiert.`);
+  copy(copyable.map((i) => i.url).join('\n'), n === 1 ? '1 link copied.' : `${n} links copied.`);
 });
 
 chrome.storage.session.onChanged.addListener((changes) => {

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <title>StreamScout</title>
+    <link rel="stylesheet" href="popup.css" />
+    <script type="module" src="popup.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="site">
+        <h1>StreamScout</h1>
+        <span id="site-host" class="site-host"></span>
+      </div>
+      <button id="deactivate" type="button" hidden>Deaktivieren</button>
+    </header>
+
+    <p id="unsupported" class="note" hidden>StreamScout funktioniert nur auf http- und https-Seiten.</p>
+
+    <section id="inactive" class="inactive" hidden>
+      <p class="note">StreamScout ist auf dieser Seite nicht aktiv. Erst nach der Aktivierung werden Streams erkannt.</p>
+      <button id="activate" class="primary" type="button">Auf dieser Seite aktivieren</button>
+    </section>
+
+    <section id="active" hidden>
+      <div class="toolbar">
+        <label class="setting">
+          ffmpeg für
+          <select id="shell"></select>
+        </label>
+        <label class="setting" title="Seiten-URL ohne Query als -referer mitsenden. Manche Server verlangen das.">
+          <input id="referer" type="checkbox" />
+          Referer
+        </label>
+        <button id="copy-all" type="button" disabled>Alle Links kopieren</button>
+      </div>
+      <p id="empty" class="note" hidden>Keine Streams gefunden. Starte die Wiedergabe oder lade die Seite neu.</p>
+      <ul id="list"></ul>
+
+      <section id="frames" class="frames" hidden>
+        <h2>Eingebettete Seiten</h2>
+        <p class="note">Player in iframes werden nur erkannt, wenn ihre Seite ebenfalls aktiviert ist.</p>
+        <ul id="frame-list"></ul>
+      </section>
+    </section>
+
+    <p id="toast" class="toast" role="status" aria-live="polite"></p>
+
+    <template id="frame-template">
+      <li class="frame">
+        <span class="frame-host"></span>
+        <button class="small" type="button"></button>
+      </li>
+    </template>
+
+    <template id="item-template">
+      <li class="item">
+        <div class="meta">
+          <span class="title"></span>
+          <span class="host"></span>
+          <span class="status"></span>
+        </div>
+        <div class="tools">
+          <label class="filename">
+            <span class="visually-hidden">Dateiname</span>
+            <input type="text" spellcheck="false" autocomplete="off" maxlength="80" />
+            <span class="ext">.mp4</span>
+          </label>
+          <div class="actions">
+            <button class="copy-link primary" type="button">Link kopieren</button>
+            <button class="copy-command small" type="button">ffmpeg-Befehl kopieren</button>
+          </div>
+        </div>
+      </li>
+    </template>
+  </body>
+</html>
